@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Semangat Terus!</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="smiley.png"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #ffe1e8, #ffd1dc);
+        overflow: hidden;
+      }
+
+      /* Tombol awal */
+      #startBtn {
+        padding: 15px 40px;
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: white;
+        background: #ff4f81;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        box-shadow: 0 6px 15px rgba(255, 79, 129, 0.4);
+        transition: all 0.3s ease;
+      }
+      #startBtn:hover {
+        background: #ff2e63;
+        transform: scale(1.1);
+      }
+
+      .content {
+        display: none;
+        text-align: center;
+        animation: fadeIn 1.5s ease forwards;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        font-family: "Pacifico", cursive;
+        color: #ff2e63;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+      }
+
+      h3 {
+        color: #4a4a4a;
+        font-weight: 400;
+        margin: 10px 0;
+      }
+
+      /* --- Heart Animation (from test.html) --- */
+      .heart-container {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 20px 0;
+        transform: scale(0.8);
+      }
+
+      .heart {
+        position: relative;
+        width: 276px;
+        height: 200px;
+      }
+
+      .heart-piece {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        background-color: black;
+        position: absolute;
+      }
+
+      .heart-piece:nth-last-of-type(6n + 0) {
+        background-color: #ec2d73;
+      }
+      .heart-piece:nth-last-of-type(6n + 1) {
+        background-color: #eb5324;
+      }
+      .heart-piece:nth-last-of-type(6n + 2) {
+        background-color: #fdc800;
+      }
+      .heart-piece:nth-last-of-type(6n + 3) {
+        background-color: #47b264;
+      }
+      .heart-piece:nth-last-of-type(6n + 4) {
+        background-color: #1470bd;
+      }
+      .heart-piece:nth-last-of-type(6n + 5) {
+        background-color: #76469a;
+      }
+
+      /* --- Keyframes --- */
+      .heart-piece:nth-last-of-type(5) {
+        animation: fifth-piece 3.2s infinite;
+      }
+      @keyframes fifth-piece {
+        0%,
+        10%,
+        90%,
+        100% {
+          top: -10px;
+          height: 20px;
+        }
+        45%,
+        55% {
+          top: -46px;
+          height: 188px;
+        }
+      }
+
+      .heart-piece:nth-of-type(4),
+      .heart-piece:nth-of-type(6) {
+        animation: fourth-piece 3.2s infinite;
+      }
+      @keyframes fourth-piece {
+        0%,
+        10%,
+        90%,
+        100% {
+          top: -10px;
+          height: 20px;
+        }
+        45%,
+        55% {
+          top: -60px;
+          height: 180px;
+        }
+      }
+
+      .heart-piece:nth-of-type(3),
+      .heart-piece:nth-of-type(7) {
+        animation: third-piece 3.2s infinite;
+      }
+      @keyframes third-piece {
+        0%,
+        10%,
+        90%,
+        100% {
+          top: -10px;
+          height: 20px;
+        }
+        45%,
+        55% {
+          top: -74px;
+          height: 160px;
+        }
+      }
+
+      .heart-piece:nth-of-type(2),
+      .heart-piece:nth-of-type(8) {
+        animation: second-piece 3.2s infinite;
+      }
+      @keyframes second-piece {
+        0%,
+        10%,
+        90%,
+        100% {
+          top: -10px;
+          height: 20px;
+        }
+        45%,
+        55% {
+          top: -60px;
+          height: 120px;
+        }
+      }
+
+      .heart-piece:nth-of-type(1),
+      .heart-piece:nth-of-type(9) {
+        animation: first-piece 3.2s infinite;
+      }
+      @keyframes first-piece {
+        0%,
+        10%,
+        90%,
+        100% {
+          top: -10px;
+          height: 20px;
+        }
+        45%,
+        55% {
+          top: -30px;
+          height: 60px;
+        }
+      }
+
+      /* --- Positioning --- */
+      .heart-piece:nth-of-type(1) {
+        left: 0px;
+      }
+      .heart-piece:nth-of-type(2) {
+        left: 32px;
+        animation-delay: 0.15s;
+      }
+      .heart-piece:nth-of-type(3) {
+        left: 64px;
+        animation-delay: 0.3s;
+      }
+      .heart-piece:nth-of-type(4) {
+        left: 96px;
+        animation-delay: 0.45s;
+      }
+      .heart-piece:nth-of-type(5) {
+        left: 128px;
+        animation-delay: 0.6s;
+      }
+      .heart-piece:nth-of-type(6) {
+        left: 160px;
+        animation-delay: 0.75s;
+      }
+      .heart-piece:nth-of-type(7) {
+        left: 192px;
+        animation-delay: 0.9s;
+      }
+      .heart-piece:nth-of-type(8) {
+        left: 224px;
+        animation-delay: 1.05s;
+      }
+      .heart-piece:nth-of-type(9) {
+        left: 256px;
+        animation-delay: 1.2s;
+      }
+
+      /* Responsif */
+      @media (max-width: 600px) {
+        h1 {
+          font-size: 1.8rem;
+        }
+        #startBtn {
+          font-size: 1rem;
+          padding: 12px 28px;
+        }
+        .heart-container {
+          transform: scale(0.7); /* Lebih kecil di layar ponsel */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <button id="startBtn">Klik Aku 🤍</button>
+
+    <audio id="backgroundMusic" loop>
+      <source src="song.mp3" type="audio/mpeg" />
+      Browser Anda tidak mendukung elemen audio.
+    </audio>
+
+    <div class="content">
+      <h1>Semangat Terus Yaa!</h1>
+      <br />
+      <div class="heart-container">
+        <div class="heart">
+          <span class="heart-piece"></span>
+          <span class="heart-piece"></span>
+          <span class="heart-piece"></span>
+          <span class="heart-piece"></span>
+          <span class="heart-piece"></span>
+          <span class="heart-piece"></span>
+          <span class="heart-piece"></span>
+          <span class="heart-piece"></span>
+          <span class="heart-piece"></span>
+        </div>
+        <h3>Aku percaya kok kamu pasti bisa!💪</h3>
+        <h3>from: Someone 💖</h3>
+      </div>
+    </div>
+
+    <script>
+      const btn = document.getElementById("startBtn");
+      const content = document.querySelector(".content");
+      const music = document.getElementById("backgroundMusic");
+
+      btn.addEventListener("click", () => {
+        // Sembunyikan tombol
+        btn.style.display = "none";
+        // Tampilkan konten utama
+        content.style.display = "block";
+        // Putar musik
+        music.play();
+      });
+    </script>
+  </body>
+</html>
