@@ -1,15 +1,83 @@
+class Fireworks {
+    constructor(canvas) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.particles = [];
+        this.animationId = null;
+        
+        this.resize();
+        window.addEventListener('resize', () => this.resize());
+    }
+
+    resize() {
+        this.canvas.width = this.canvas.offsetWidth;
+        this.canvas.height = this.canvas.offsetHeight;
+    }
+
+    createExplosion(x, y) {
+        const colors = ['#ff0000', '#ffa500', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#ee82ee', '#ffffff'];
+        for (let i = 0; i < 100; i++) {
+            this.particles.push({
+                x, y,
+                vx: (Math.random() - 0.5) * 15,
+                vy: (Math.random() - 0.5) * 15,
+                life: 1.0,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                size: Math.random() * 4 + 1
+            });
+        }
+        
+        if (!this.animationId) {
+            this.animate();
+        }
+    }
+
+    animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.15; // gravity
+            p.life -= 0.01;
+            
+            if (p.life <= 0) {
+                this.particles.splice(i, 1);
+                continue;
+            }
+            
+            this.ctx.globalAlpha = p.life;
+            this.ctx.fillStyle = p.color;
+            this.ctx.beginPath();
+            this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            this.ctx.fill();
+        }
+        
+        if (this.particles.length > 0) {
+            this.animationId = requestAnimationFrame(() => this.animate());
+        } else {
+            this.animationId = null;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+    }
+}
+
 class Calculator {
     constructor() {
         this.displayValue = '0';
         this.firstOperand = null;
         this.waitingForSecondOperand = false;
         this.operator = null;
+        this.secretActive = false;
+        
+        const canvas = document.getElementById('fireworks');
+        this.fireworks = new Fireworks(canvas);
         
         this.initializeButtons();
     }
     
     initializeButtons() {
-        const display = document.querySelector('.display-text');
         const buttons = document.querySelectorAll('.btn');
         
         buttons.forEach(button => {
@@ -34,6 +102,11 @@ class Calculator {
     }
     
     inputNumber(num) {
+        if (this.secretActive) {
+            this.clear();
+            this.secretActive = false;
+        }
+        
         if (this.waitingForSecondOperand) {
             this.displayValue = num;
             this.waitingForSecondOperand = false;
@@ -43,6 +116,11 @@ class Calculator {
     }
     
     inputDecimal() {
+        if (this.secretActive) {
+            this.clear();
+            this.secretActive = false;
+        }
+        
         if (this.waitingForSecondOperand) {
             this.displayValue = '0.';
             this.waitingForSecondOperand = false;
@@ -59,6 +137,7 @@ class Calculator {
         this.firstOperand = null;
         this.waitingForSecondOperand = false;
         this.operator = null;
+        this.secretActive = false;
         this.removeActiveOperator();
     }
     
@@ -73,6 +152,33 @@ class Calculator {
     handleOperator(nextOperator) {
         const inputValue = parseFloat(this.displayValue);
         
+        // Cek kode rahasia: 11 x 11 =
+        if (nextOperator === 'equals' && 
+            this.firstOperand === 11 && 
+            this.operator === 'multiply' && 
+            inputValue === 11) {
+            
+            this.displayValue = 'nana';
+            this.firstOperand = null;
+            this.operator = null;
+            this.waitingForSecondOperand = false;
+            this.secretActive = true;
+            this.removeActiveOperator();
+            
+            // Ledakan meriah!
+            const rect = document.querySelector('.calculator').getBoundingClientRect();
+            const canvasRect = document.getElementById('fireworks').getBoundingClientRect();
+            for(let i=0; i<5; i++) {
+                setTimeout(() => {
+                    this.fireworks.createExplosion(
+                        Math.random() * canvasRect.width, 
+                        Math.random() * canvasRect.height * 0.5
+                    );
+                }, i * 300);
+            }
+            return;
+        }
+
         if (this.firstOperand === null && !isNaN(inputValue)) {
             this.firstOperand = inputValue;
         } else if (this.operator) {
@@ -107,15 +213,24 @@ class Calculator {
     updateDisplay() {
         const display = document.querySelector('.display-text');
         
-        // Format large numbers
+        if (this.displayValue === 'nana') {
+            display.textContent = 'nana';
+            display.style.color = '#ff9f0a';
+            display.style.fontWeight = 'bold';
+            display.style.textShadow = '0 0 10px #ff9f0a';
+            return;
+        } else {
+            display.style.color = '#fff';
+            display.style.fontWeight = '300';
+            display.style.textShadow = 'none';
+        }
+        
         let displayText = this.displayValue;
         
-        // Limit decimal places for better display
         if (displayText.includes('.') && displayText.split('.')[1].length > 6) {
             displayText = parseFloat(displayText).toFixed(6);
         }
         
-        // Handle very large numbers
         if (displayText.length > 9) {
             displayText = parseFloat(displayText).toExponential(2);
         }
@@ -140,7 +255,6 @@ class Calculator {
     }
 }
 
-// Initialize calculator when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    const calculator = new Calculator();
+    new Calculator();
 });
