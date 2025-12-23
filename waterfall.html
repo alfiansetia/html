@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Waterfall Nana</title>
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #0b1c2d;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resize);
+        resize();
+
+        /* ================= WATER DROPS ================= */
+        class Drop {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = canvas.width / 2 + (Math.random() - 0.5) * (canvas.width * 0.3);
+                this.y = Math.random() * -canvas.height;
+                this.speed = 6 + Math.random() * 4;
+                this.length = 15 + Math.random() * 20;
+                this.alpha = 0.4 + Math.random() * 0.4;
+            }
+            update() {
+                this.y += this.speed;
+                if (this.y > canvas.height - 80) this.reset();
+            }
+            draw() {
+                ctx.strokeStyle = `rgba(180,220,255,${this.alpha})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x, this.y + this.length);
+                ctx.stroke();
+            }
+        }
+
+        const drops = Array.from({
+            length: 500
+        }, () => new Drop());
+
+        /* ================= RAINBOW ================= */
+        function drawRainbow() {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height - 40;
+            const rainbowColors = [
+                'rgba(255, 0, 0, 0.2)', // Merah
+                'rgba(255, 127, 0, 0.2)', // Oranye
+                'rgba(255, 255, 0, 0.2)', // Kuning
+                'rgba(0, 255, 0, 0.2)', // Hijau
+                'rgba(0, 0, 255, 0.2)', // Biru
+                'rgba(75, 0, 130, 0.2)', // Nila
+                'rgba(148, 0, 211, 0.2)' // Ungu
+            ];
+
+            // Responsif: pelangi mengambil 70% dari lebar layar
+            const baseRadius = canvas.width * 0.35;
+            const arcWidth = canvas.width * 0.035; // ~3.5% dari lebar layar
+
+            // Gambar pelangi dari luar ke dalam
+            for (let i = rainbowColors.length - 1; i >= 0; i--) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, baseRadius + (i * arcWidth), Math.PI, 0, false);
+                ctx.strokeStyle = rainbowColors[i];
+                ctx.lineWidth = arcWidth;
+                ctx.stroke();
+            }
+        }
+
+        /* ================= MIST ================= */
+        let mistOffset = 0;
+
+        function drawMist() {
+            mistOffset += 0.3;
+            const g = ctx.createRadialGradient(
+                canvas.width / 2,
+                canvas.height - 60,
+                canvas.width * 0.05,
+                canvas.width / 2,
+                canvas.height - 60,
+                canvas.width * 0.65
+            );
+            g.addColorStop(0, "rgba(255,255,255,0.25)");
+            g.addColorStop(1, "rgba(255,255,255,0)");
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.ellipse(
+                canvas.width / 2,
+                canvas.height - 60 + Math.sin(mistOffset * 0.01) * 5,
+                canvas.width * 0.8,
+                canvas.width * 0.3,
+                0,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+        }
+
+        /* ================= TEXT PARTICLES ================= */
+        class TextParticle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.alpha = 1;
+                this.size = 40;
+                this.vy = -0.6;
+            }
+            update() {
+                this.y += this.vy;
+                this.alpha -= 0.01;
+            }
+            draw() {
+                ctx.font = `bold ${this.size}px Arial`;
+                ctx.fillStyle = `rgba(255,255,255,${this.alpha})`;
+                ctx.textAlign = "center";
+                ctx.shadowColor = "rgba(180,220,255,0.8)";
+                ctx.shadowBlur = 20;
+                ctx.fillText("nana", this.x, this.y);
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        const texts = [];
+
+/* ================= GRASS ================= */
+function drawGrass() {
+    const groundY = canvas.height - 30;
+    
+    // Tanah
+    ctx.fillStyle = "#1a4d2e";
+    ctx.fillRect(0, groundY, canvas.width, 30);
+    
+    // Rumput
+    for (let i = 0; i < canvas.width; i += 8) {
+        const height = 10 + Math.random() * 15;
+        ctx.strokeStyle = `rgba(76, 175, 80, ${0.6 + Math.random() * 0.4})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(i, groundY);
+        ctx.lineTo(i + Math.random() * 3 - 1.5, groundY - height);
+        ctx.stroke();
+    }
+}
+
+/* ================= TREES ================= */
+function drawTree(x, y, size) {
+    // Batang pohon
+    ctx.fillStyle = "#5d4037";
+    ctx.fillRect(x - size * 0.15, y, size * 0.3, size * 0.8);
+    
+    // Daun (3 lingkaran)
+    ctx.fillStyle = "#2e7d32";
+    ctx.beginPath();
+    ctx.arc(x, y - size * 0.2, size * 0.4, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(x - size * 0.25, y - size * 0.4, size * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(x + size * 0.25, y - size * 0.4, size * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+}
+
+function drawTrees() {
+    const groundY = canvas.height - 30;
+    
+    // Pohon kiri
+    drawTree(canvas.width * 0.15, groundY - 40, 60);
+    drawTree(canvas.width * 0.08, groundY - 30, 45);
+    
+    // Pohon kanan
+    drawTree(canvas.width * 0.85, groundY - 40, 60);
+    drawTree(canvas.width * 0.92, groundY - 30, 45);
+}
+
+/* ================= SHEEP ================= */
+class Sheep {
+    constructor() {
+        this.x = Math.random() * canvas.width * 0.3 + canvas.width * 0.2;
+        this.y = canvas.height - 60;
+        this.vx = 0.3 + Math.random() * 0.5;
+        this.direction = Math.random() > 0.5 ? 1 : -1;
+        this.size = 25 + Math.random() * 10;
+        this.legPhase = Math.random() * Math.PI * 2;
+        this.eating = false;
+        this.eatTimer = 0;
+        this.headBob = 0;
+    }
+    
+    update() {
+        if (this.eating) {
+            this.eatTimer++;
+            this.headBob = Math.sin(this.eatTimer * 0.2) * 3;
+            if (this.eatTimer > 100) {
+                this.eating = false;
+                this.eatTimer = 0;
+            }
+        } else {
+            this.x += this.vx * this.direction;
+            this.legPhase += 0.15;
+            
+            // Random makan
+            if (Math.random() < 0.01) {
+                this.eating = true;
+            }
+        }
+        
+        // Balik arah di tepi
+        if (this.x < canvas.width * 0.1) this.direction = 1;
+        if (this.x > canvas.width * 0.9) this.direction = -1;
+    }
+    
+    draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        if (this.direction < 0) ctx.scale(-1, 1);
+        
+        // Kaki
+        const legOffset = Math.sin(this.legPhase) * 3;
+        ctx.fillStyle = "#000";
+        ctx.fillRect(-this.size * 0.4, this.size * 0.3, 3, this.size * 0.4 + legOffset);
+        ctx.fillRect(-this.size * 0.15, this.size * 0.3, 3, this.size * 0.4 - legOffset);
+        ctx.fillRect(this.size * 0.15, this.size * 0.3, 3, this.size * 0.4 + legOffset);
+        ctx.fillRect(this.size * 0.4, this.size * 0.3, 3, this.size * 0.4 - legOffset);
+        
+        // Badan (oval putih)
+        ctx.fillStyle = "#f5f5f5";
+        ctx.beginPath();
+        ctx.ellipse(0, 0, this.size * 0.6, this.size * 0.4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Kepala
+        ctx.fillStyle = "#e0e0e0";
+        ctx.beginPath();
+        ctx.arc(this.size * 0.5, -this.size * 0.1 + this.headBob, this.size * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Telinga
+        ctx.fillStyle = "#d0d0d0";
+        ctx.beginPath();
+        ctx.ellipse(this.size * 0.4, -this.size * 0.25 + this.headBob, this.size * 0.1, this.size * 0.15, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(this.size * 0.6, -this.size * 0.25 + this.headBob, this.size * 0.1, this.size * 0.15, 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Mata
+        ctx.fillStyle = "#000";
+        ctx.beginPath();
+        ctx.arc(this.size * 0.55, -this.size * 0.15 + this.headBob, 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Hidung
+        ctx.fillStyle = "#ffb6c1";
+        ctx.beginPath();
+        ctx.arc(this.size * 0.65, -this.size * 0.05 + this.headBob, 3, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+    }
+}
+
+const sheep = [new Sheep(), new Sheep(), new Sheep()];
+
+
+        /* ================= BACKGROUND ================= */
+        function drawBackground() {
+            const bg = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            bg.addColorStop(0, "#102a43");
+            bg.addColorStop(1, "#06111c");
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        /* ================= CLICK / TAP ================= */
+        canvas.addEventListener("click", e => {
+            texts.push(new TextParticle(e.clientX, e.clientY));
+        });
+
+        /* ================= LOOP ================= */
+        function animate() {
+            drawBackground();
+
+            drops.forEach(d => {
+                d.update();
+                d.draw();
+            });
+
+            drawRainbow();
+
+            drawMist();
+            
+            // Landscape elements
+            drawGrass();
+            drawTrees();
+            
+            // Sheep
+            sheep.forEach(s => {
+                s.update();
+                s.draw();
+            });
+
+            texts.forEach((t, i) => {
+                t.update();
+                t.draw();
+                if (t.alpha <= 0) texts.splice(i, 1);
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+
+</body>
+
+</html>
