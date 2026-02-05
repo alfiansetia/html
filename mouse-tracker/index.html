@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mouse Tracker - Premium Detector</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta name="description" content="Demo interaktif deteksi pergerakan mouse menggunakan HTML dan JavaScript dengan desain premium.">
+</head>
+<body>
+    <div class="blob" id="blob"></div>
+    <div class="blur"></div>
+
+    <main>
+        <div class="container">
+            <header>
+                <h1>Mouse Detector</h1>
+                <p>Menggunakan <code>mousemove</code> event listener</p>
+            </header>
+
+            <div class="tracker-card">
+                <div class="coordinate-box">
+                    <span class="label">X Coordinate</span>
+                    <span class="value" id="val-x">0</span>
+                </div>
+                <div class="divider"></div>
+                <div class="coordinate-box">
+                    <span class="label">Y Coordinate</span>
+                    <span class="value" id="val-y">0</span>
+                </div>
+            </div>
+
+            <div class="status-badge">
+                <span class="dot"></span>
+                <span id="status-text">Menunggu pergerakan...</span>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
